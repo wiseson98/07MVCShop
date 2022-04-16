@@ -43,7 +43,7 @@ public class ProductController {
 	@Value("#{commonProperties['pageSize']}")
 	int pageSize;
 	
-	@RequestMapping(value = "addProduct", method = RequestMethod.GET)
+	@RequestMapping(value = "/addProduct", method = RequestMethod.GET)
 	public String addProduct() throws Exception{
 		
 		System.out.println("/product/addProduct : GET");		
