@@ -61,10 +61,10 @@ public class ProductController {
 		return "forward:/product/addProduct.jsp";
 	}
 	
-	@RequestMapping("/getProduct.do")
+	@RequestMapping(value = "/getProduct", method = RequestMethod.GET)
 	public String getProduct(@RequestParam("prodNo") int prodNo, Model model, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		
-		System.out.println("/getProduct.do");
+		System.out.println("/getProduct");
 		
 		Product product = productService.getProduct(prodNo);
 		
@@ -91,10 +91,10 @@ public class ProductController {
 		return "forward:/product/readProduct.jsp";
 	}
 	
-	@RequestMapping("/listProduct.do")
+	@RequestMapping(value = "/listProduct")
 	public String listProduct(@ModelAttribute("search") Search search, @RequestParam(value = "menu", defaultValue = "search") String menu, Model model) throws Exception{
 		
-		System.out.println("/listProduct.do");
+		System.out.println("/listProduct");
 		
 		if(search.getCurrentPage() == 0) {
 			search.setCurrentPage(1);
@@ -114,10 +114,10 @@ public class ProductController {
 		return "forward:/product/listProduct.jsp";
 	}
 	
-	@RequestMapping("/updateProductView.do")
-	public String updateProductView(@RequestParam("prodNo") int prodNo, Model model) throws Exception{
+	@RequestMapping(value = "/updateProduct", method = RequestMethod.GET)
+	public String updateProduct(@RequestParam("prodNo") int prodNo, Model model) throws Exception{
 		
-		System.out.println("/updateProductView.do");
+		System.out.println("/updateProductView");
 		
 		Product product = productService.getProduct(prodNo);
 		
@@ -126,14 +126,14 @@ public class ProductController {
 		return "forward:/product/updateProduct.jsp";
 	}
 	
-	@RequestMapping("/updateProduct.do")
+	@RequestMapping(value = "/updateProduct", method = RequestMethod.POST)
 	public String updateProduct(@ModelAttribute("product") Product product ) throws Exception{
 		
-		System.out.println("/updateProduct.do");
+		System.out.println("/updateProduct");
 		
 		productService.updateProduct(product);
 		
-		return "redirect:/getProduct.do?prodNo=" + product.getProdNo();
+		return "redirect:/product/getProduct?prodNo=" + product.getProdNo();
 	}	
 
 }//end of class

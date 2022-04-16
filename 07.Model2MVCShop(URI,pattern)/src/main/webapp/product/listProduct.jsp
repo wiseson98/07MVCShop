@@ -101,7 +101,7 @@
 			<td align="center">${ i }</td>
 			<td></td>
 			<td align="left">
-				<a href="${ menu == 'manage' ? '/product/updateProductView' : '/product/getProduct'}?prodNo=${  product.prodNo }&menu=${ menu }">
+				<a href="${ menu == 'manage' ? '/product/updateProduct' : '/product/getProduct'}?prodNo=${  product.prodNo }&menu=${ menu }">
 					${ product.prodName }
 				</a>
 			</td>
