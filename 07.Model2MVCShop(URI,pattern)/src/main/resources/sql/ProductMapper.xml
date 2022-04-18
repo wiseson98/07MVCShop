@@ -16,6 +16,7 @@
 		<result property="fileName" 		column="image_file" 		jdbcType="VARCHAR" />
 		<result property="regDate" 			column="reg_date" 			jdbcType="DATE" />
 		<result property="proTranCode" 		column="prod_status_code" 	jdbcType="CHAR" />
+		<result property="prodCategory" 	column="category_code" 		jdbcType="CHAR" />
 	</resultMap>
 	
 	<!-- SQL : INSERT -->

@@ -44,6 +44,20 @@
 	</tr>
 </table>
 
+<table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top:10px;">
+	<tr align="center">
+		<td class="ct_btn01" style="padding-top:3px;" >
+			<a href="javascript:fncGetList('1');">a</a>
+		</td>
+		<td class="ct_btn01" style="padding-top:3px;" >
+			<a href="javascript:fncGetList('1');">b</a>
+		</td>
+		<td class="ct_btn01" style="padding-top:3px;" >
+			<a href="javascript:fncGetList('1');">c</a>
+		</td>
+	</tr>
+</table>
+
 
 <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top:10px;">
 	<tr>
@@ -102,7 +116,7 @@
 			<td></td>
 			<td align="left">
 				<a href="${ menu == 'manage' ? '/product/updateProduct' : '/product/getProduct'}?prodNo=${  product.prodNo }&menu=${ menu }">
-					<img src = "/images/uploadFiles/${ ! empty product.fileName ? product.fileName : "../empty.GIF"}" style="max-width:50%; height:auto;"/>	
+					<img src = "/images/uploadFiles/${ ! empty product.fileName ? product.fileName : "../empty.GIF"}" style="max-width:40%; height:auto;"/>	
 					${ product.prodName }
 				</a>
 			</td>
