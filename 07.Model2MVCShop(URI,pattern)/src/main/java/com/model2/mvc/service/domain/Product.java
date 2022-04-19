@@ -13,7 +13,6 @@ public class Product {
 	private int prodNo;
 	private Date regDate;
 	private String proTranCode;
-	private String prodCategory;
 	
 	public Product(){
 	}
@@ -65,12 +64,6 @@ public class Product {
 	}
 	public void setRegDate(Date regDate) {
 		this.regDate = regDate;
-	}	
-	public String getProdCategory() {
-		return prodCategory;
-	}
-	public void setProdCategory(String prodCategory) {
-		this.prodCategory = prodCategory;
 	}
 
 	// Override
