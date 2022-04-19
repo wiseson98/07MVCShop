@@ -10,7 +10,7 @@
 
 <script type="text/javascript">
 	// 검색 / page 두가지 경우 모두 Form 전송을 위해 JavaScript 이용
-	function fncGetList(currentPage){
+	function fncGetProductList(currentPage){
 		document.getElementById("currentPage").value = currentPage;
 		document.detailForm.submit();
 	}
@@ -64,7 +64,7 @@
 						<img src="/images/ct_btnbg01.gif" width="17" height="23">
 					</td>
 					<td background="/images/ct_btnbg02.gif" class="ct_btn01" style="padding-top:3px;">
-						<a href="javascript:fncGetList('1');">검색</a>
+						<a href="javascript:fncGetProductList('1');">검색</a>
 					</td>
 					<td width="14" height="23">
 						<img src="/images/ct_btnbg03.gif" width="14" height="23">
@@ -81,11 +81,11 @@
 		<td colspan="11" >전체 ${ resultPage.totalCount } 건수, 현재 ${ resultPage.currentPage } 페이지</td>
 	</tr>
 	<tr>
-		<td class="ct_list_b" width="70">No</td>
+		<td class="ct_list_b" width="100">No</td>
 		<td class="ct_line02"></td>
-		<td class="ct_list_b" width="300">상품명</td>
+		<td class="ct_list_b" width="150">상품명</td>
 		<td class="ct_line02"></td>
-		<td class="ct_list_b" width="100">가격</td>
+		<td class="ct_list_b" width="150">가격</td>
 		<td class="ct_line02"></td>
 		<td class="ct_list_b">등록일</td>	
 		<td class="ct_line02"></td>
@@ -102,16 +102,15 @@
 			<td></td>
 			<td align="left">
 				<a href="${ menu == 'manage' ? '/product/updateProduct' : '/product/getProduct'}?prodNo=${  product.prodNo }&menu=${ menu }">
-					<img src = "/images/uploadFiles/${ ! empty product.fileName ? product.fileName : "../empty.GIF"}" style="max-width:50%; height:auto;"/>	
 					${ product.prodName }
 				</a>
 			</td>
 			<td></td>
-			<td align="center">${ product.price }</td>
+			<td align="left">${ product.price }</td>
 			<td></td>
-			<td align="center">${ product.regDate }</td>
+			<td align="left">${ product.regDate }</td>
 			<td></td>
-			<td align="center">
+			<td align="left">
 				<c:choose>
 					<c:when test="${ product.proTranCode != '001' }">
 						판매 완료
@@ -132,9 +131,24 @@
 	<tr>
 		<td align="center">
 			<input type="hidden" id="currentPage" name="currentPage" value=""/>
-						 
-				<jsp:include page="../common/pageNavigator.jsp"/>
-				
+			 
+			<c:if test="${ resultPage.currentPage <= resultPage.pageUnit }">
+				◀ 이전
+			</c:if>
+			<c:if test="${ resultPage.currentPage > resultPage.pageUnit }">
+					<a href="javascript:fncGetProductList('${ resultPage.currentPage-1}')">◀ 이전</a>
+			</c:if>
+			
+			<c:forEach var="i"  begin="${resultPage.beginUnitPage}" end="${resultPage.endUnitPage}" step="1">
+				<a href="javascript:fncGetProductList('${ i }');">${ i }</a>
+			</c:forEach>
+			
+			<c:if test="${ resultPage.endUnitPage >= resultPage.maxPage }">
+					이후 ▶
+			</c:if>
+			<c:if test="${ resultPage.endUnitPage < resultPage.maxPage }">
+					<a href="javascript:fncGetProductList('${resultPage.endUnitPage+1}')">이후 ▶</a>
+			</c:if>	
     	</td>
 	</tr>
 </table>
