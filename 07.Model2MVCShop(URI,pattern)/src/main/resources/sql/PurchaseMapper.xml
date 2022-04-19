@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="PurchaseMapper">
+ 	
+ 	
+	<resultMap id="purchaseSelectMap" type="purchase">
+	
+		<result property="tranNo" column="tran_no" jdbcType="NUMERIC"/>
+		<result property="paymentOption" column="payment_option" jdbcType="CHAR"/>
+		<result property="receiverName" column="receiver_name" jdbcType="VARCHAR"/>
+		<result property="receiverPhone" column="receiver_phone" jdbcType="VARCHAR"/>
+		<result property="dlvyAddr" column="dlvy_addr" jdbcType="VARCHAR"/>
+		<result property="dlvyRequest" column="dlvy_request" jdbcType="VARCHAR"/>
+		<result property="tranCode" column="tran_status_code" jdbcType="CHAR"/>
+		<result property="orderDate" column="order_date" jdbcType="DATE"/>
+		<result property="dlvyDate" column="dlvy_date" jdbcType="DATE"/>
+		
+		<association property="purchaseProd"  javaType="product">
+			<id property="prodNo" column="prod_no" jdbcType="NUMERIC"/>
+			<result property="prodName" column="prod_name" jdbcType="VARCHAR"/>			
+		</association>
+		
+		<association property="buyer"  javaType="user">
+			<id property="userId" column="buyer_id" jdbcType="VARCHAR"/>
+			<result property="userName" column="user_name" jdbcType="VARCHAR"/>
+		</association>
+	</resultMap>
+	
+	<!-- SQL : INSERT -->
+	<insert 	id="addPurchase"	parameterType="purchase" >
+	 	INSERT
+		INTO transaction 
+		VALUES ( seq_transaction_tran_no.NEXTVAL, #{purchaseProd.prodNo}, #{buyer.userId}, 
+				#{paymentOption:CHAR}, #{receiverName:VARCHAR}, #{receiverPhone:VARCHAR},
+				#{dlvyAddr:VARCHAR}, #{dlvyRequest:VARCHAR}, #{tranCode:CHAR},
+				SYSDATE, TO_DATE(#{dlvyDate:DATE}, 'YYYY-MM-DD') )
+	</insert>	 
+	
+	<!-- SQL : SELECT -->
+	<select id="getPurchase" parameterType="int"  resultMap="purchaseSelectMap">
+		SELECT
+		t.tran_no, p.prod_no, p.prod_name, t.buyer_id, 
+		t.receiver_name, t.receiver_phone, t.payment_option, 
+		t.dlvy_addr, t.dlvy_request, t.tran_status_code, 
+		t.order_date, TO_CHAR(t.dlvy_date, 'YYYY-MM-DD HH:MM:SS') dlvy_date
+		FROM product p, transaction t
+		WHERE p.prod_no = t.prod_no(+) AND tran_no = #{tranNo}
+	</select>
+	 
+	<!-- SQL : UPDATE -->
+	<update	id="updatePurchase"	parameterType="purchase" >
+	   	UPDATE transaction
+	   	<set>
+	   		payment_option 	= #{paymentOption:CHAR},
+			receiver_name	= #{receiverName:VARCHAR},
+			receiver_phone	= #{receiverPhone:VARCHAR},
+			dlvy_addr		= #{dlvyAddr:VARCHAR},
+			dlvy_request	= #{dlvyRequest:VARCHAR},
+			dlvy_date		= TO_DATE(#{dlvyDate:DATE}, 'YYYY-MM-DD')
+	   	</set>
+	   	WHERE tran_no = #{tranNo}
+	</update> 
+	
+	<!-- SQL : UPDATE -->
+	<update	id="updateTranCode"	parameterType="purchase" >
+	   	UPDATE transaction
+	   	<set>
+	   		tran_status_code = #{tranCode:CHAR}
+	   	</set>
+	   	WHERE tran_no = #{tranNo}
+	</update> 
+	
+	<!-- SQL : SELECT LIST -->
+	<select  id="getPurchaseList"  parameterType="map"	resultMap="purchaseSelectMap">
+	  	SELECT *
+	  	FROM (	SELECT inner_table.* , ROWNUM AS row_seq
+	  			FROM		(	SELECT tran_no, receiver_name, receiver_phone, tran_status_code 
+								FROM transaction
+								<where>
+									<if test="searchCondition != null">
+										<if test="searchKeyword != null or searchKeyword !='' ">
+							 				buyer_id = #{searchKeyword}
+										</if>												
+									</if>
+								</where>
+						ORDER BY order_date DESC ) inner_table
+				WHERE ROWNUM &lt;= #{endRowNum} )
+		WHERE row_seq BETWEEN #{startRowNum} AND #{endRowNum} 
+	</select>
+	
+	<!-- SQL : SELECT LIST -->
+	<select  id="getSaleList"  parameterType="map"	resultMap="purchaseSelectMap">
+	  	SELECT *
+	  	FROM (	SELECT inner_table.* , ROWNUM AS row_seq
+	  			FROM		(	SELECT tran_no, prod_no, buyer_id, order_date, tran_status_code 
+								FROM transaction								
+								ORDER BY order_date DESC ) inner_table
+				WHERE ROWNUM &lt;= #{endRowNum} )
+		WHERE row_seq BETWEEN #{startRowNum} AND #{endRowNum} 
+	</select>
+	
+	<!-- SQL : SELECT ROW Count -->	 
+	<select  id="getTotalCount"  parameterType="search"	 resultType="int">
+	  	SELECT COUNT(*)
+	  	FROM(	SELECT tran_no, receiver_name, receiver_phone, tran_status_code
+						FROM transaction
+						<if test="searchCondition != null">
+							<where>
+								<if test="searchCondition != null">
+									<if test="searchKeyword != null or searchKeyword !='' ">
+						 				buyer_id = #{searchKeyword}
+									</if>												
+								</if>
+							</where>
+						</if> ) countTable						
+	</select> 
+</mapper>
