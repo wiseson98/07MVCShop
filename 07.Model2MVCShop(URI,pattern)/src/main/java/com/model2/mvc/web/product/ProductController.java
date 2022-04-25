@@ -149,10 +149,13 @@ public class ProductController {
 		model.addAttribute("product", product);
 		
 		if(product.getFileName() != null) {
+			String[] fileNames = null;
 			if(product.getFileName().indexOf(",") > 0) {
-				String[] fileNames = product.getFileName().split(",");
-				model.addAttribute("fileNames", fileNames);
+				fileNames = product.getFileName().split(",");				
+			}else {
+				fileNames[0] = product.getFileName();
 			}
+			model.addAttribute("fileNames", fileNames);
 		}		
 		
 		String cookieValue = null;
