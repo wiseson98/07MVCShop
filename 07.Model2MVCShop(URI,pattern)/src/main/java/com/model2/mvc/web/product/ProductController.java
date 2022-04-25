@@ -3,6 +3,8 @@ package com.model2.mvc.web.product;
 import java.io.File;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.model2.mvc.common.Page;
 import com.model2.mvc.common.Search;
@@ -60,19 +63,76 @@ public class ProductController {
 	}
 	
 	@RequestMapping(value = "/addProduct", method = RequestMethod.POST)
-	public String addProduct(@ModelAttribute("product") Product product, MultipartFile file) throws Exception{
+	public String addProduct(@ModelAttribute("product") Product product,  MultipartHttpServletRequest mtpReq) throws Exception{
 		
 		System.out.println("/product/addProduct : POST ");
-						
-		String savedName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
 		
-		FileCopyUtils.copy(file.getBytes(), new File(uploadPath, savedName));
-				
-		product.setFileName(savedName);
+		List<MultipartFile> fileList = mtpReq.getFiles("file");
+		
+		String fileName = getFile(fileList);	
+		System.out.println("[ 최종 fileName ] =>" + fileName);
+		if(fileName != null) {
+			product.setFileName(fileName);
+		}
 		
 		productService.addProduct(product);
 				
 		return "forward:/product/addProduct.jsp";
+	}
+	
+	public String getFile(List<MultipartFile> fileList) throws Exception{
+				
+		System.out.println("fileList size : " + fileList.size());
+		
+		String fileName = "";		
+		
+		if(fileList.size() <= 1) {
+			
+			fileName = fileList.get(0).getOriginalFilename().equals("") ? null : System.currentTimeMillis() + fileList.get(0).getOriginalFilename();
+			
+		}else {
+			
+			for(MultipartFile mf : fileList) {
+				
+				System.out.println("파일 이름 : " + mf.getOriginalFilename());
+					
+				String saveName = System.currentTimeMillis() + mf.getOriginalFilename();
+					
+				System.out.println("saveName : " + saveName);
+					
+				FileCopyUtils.copy(mf.getBytes(), new File(uploadPath, saveName));
+					
+				fileName += saveName + ",";
+				
+			}
+			
+			fileName = fileName.substring(0, (fileName.length()-1));
+			System.out.println("fileName = " + fileName);
+		}		
+		
+		return fileName;
+	}
+	
+	@RequestMapping(value = "/updateProduct", method = RequestMethod.GET)
+	public String updateProduct(@RequestParam("prodNo") int prodNo, Model model) throws Exception{
+		
+		System.out.println("/updateProductView");
+		
+		Product product = productService.getProduct(prodNo);
+		
+		model.addAttribute("product", product);
+		
+		return "forward:/product/updateProduct.jsp";
+	}
+	
+	@RequestMapping(value = "/updateProduct", method = RequestMethod.POST)
+	public String updateProduct(@ModelAttribute("product") Product product ) throws Exception{
+		
+		System.out.println("/updateProduct");
+		
+		productService.updateProduct(product);
+		
+		return "redirect:/product/getProduct?prodNo=" + product.getProdNo();
 	}
 	
 	@RequestMapping(value = "/getProduct", method = RequestMethod.GET)
@@ -82,7 +142,18 @@ public class ProductController {
 		
 		Product product = productService.getProduct(prodNo);
 		
+		System.out.println("product.getFileName : " + product.getFileName());
+		
+//		List<String> fileNames = new ArrayList<String>();		
+				
 		model.addAttribute("product", product);
+		
+		if(product.getFileName() != null) {
+			if(product.getFileName().indexOf(",") > 0) {
+				String[] fileNames = product.getFileName().split(",");
+				model.addAttribute("fileNames", fileNames);
+			}
+		}		
 		
 		String cookieValue = null;
 		Cookie cookie = null;
@@ -126,28 +197,6 @@ public class ProductController {
 		model.addAttribute("menu", menu);
 		
 		return "forward:/product/listProduct.jsp";
-	}
-	
-	@RequestMapping(value = "/updateProduct", method = RequestMethod.GET)
-	public String updateProduct(@RequestParam("prodNo") int prodNo, Model model) throws Exception{
-		
-		System.out.println("/updateProductView");
-		
-		Product product = productService.getProduct(prodNo);
-		
-		model.addAttribute("product", product);
-		
-		return "forward:/product/updateProduct.jsp";
-	}
-	
-	@RequestMapping(value = "/updateProduct", method = RequestMethod.POST)
-	public String updateProduct(@ModelAttribute("product") Product product ) throws Exception{
-		
-		System.out.println("/updateProduct");
-		
-		productService.updateProduct(product);
-		
-		return "redirect:/product/getProduct?prodNo=" + product.getProdNo();
-	}	
+	}		
 
 }//end of class

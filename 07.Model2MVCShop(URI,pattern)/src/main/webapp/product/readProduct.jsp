@@ -62,12 +62,21 @@
 		<td height="1" colspan="3" bgcolor="D6D6D6"></td>
 	</tr>
 	<tr>
-		<td width="104" class="ct_write">
+		<td width="104" class="ct_write">			
 			상품이미지 <img 	src="/images/ct_icon_red.gif" width="3" height="3" align="absmiddle"/>
 		</td>
 		<td bgcolor="D6D6D6" width="1"></td>
 		<td class="ct_write01">
-			<img src = "/images/uploadFiles/${ ! empty product.fileName ? product.fileName : "../empty.GIF"}"/>						
+			<c:choose>
+				<c:when test="${ ! empty fileNames }">
+					<c:forEach var="fileName" items="${ fileNames }">
+						<img src = "/images/uploadFiles/${ fileName }"/>	
+					</c:forEach>	
+				</c:when>
+				<c:otherwise>
+					<img src = "/images/uploadFiles/../empty.GIF"/>
+				</c:otherwise>
+			</c:choose>										
 		</td>
 	</tr>
 	<tr>
